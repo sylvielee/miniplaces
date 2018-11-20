@@ -130,10 +130,6 @@ def run():
                 if labels[i] in top5_choices[i]:
                     fiveclass_correct += 1
 
-        print("sanity check")
-        outp = model.eval(images, labels, batch_size=100)
-        print(outp)
-
         val_class_err = 1 - class_correct/val_total
         val_top5_err = 1 - fiveclass_correct/val_total
 
