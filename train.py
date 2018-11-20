@@ -21,6 +21,7 @@ def run():
     # setup the device for running
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = resnet_18()
+    change_p(.2)
     model = model.to(device)
 
     train_loader, val_loader = dataset.get_data_loaders(batch_size)
