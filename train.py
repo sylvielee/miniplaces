@@ -22,7 +22,7 @@ def run():
     # setup the device for running
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = resnet_18()
-    model.change_p(perc)
+    # model.change_p(perc)
     model = model.to(device)
 
     train_loader, val_loader = dataset.get_data_loaders(batch_size)
@@ -140,7 +140,7 @@ def run():
         val_top5_errors.append(val_top5_err)
 
         print("Validation Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (val_total, val_class_err, val_top5_err))
-        model.change_p(perc)
+        # model.change_p(perc)
         gc.collect()
         epoch += 1
 
