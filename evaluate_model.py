@@ -46,8 +46,9 @@ def evaluate_model(filepath):
             image_index += 1
 
             line = imname + " "
-            for j in range(len(prediction[i])):
-                line += str(prediction[i][j]) + " "
+            for j in range(len(best_five[i])):
+                line += str(best_five[i][j].item()) + " "
+            line += "\n"
             f.write(line)
         print("Up to image %d" % image_index)
     f.close()
