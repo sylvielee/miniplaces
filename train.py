@@ -13,7 +13,7 @@ import dataset
 from models.AlexNet import *
 from models.ResNet import *
 
-def run(model_name, cuda_num, dropout_rate, lr, momentum=0):
+def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
     # Parameters
     num_epochs = 10
     output_period = 10
@@ -29,15 +29,30 @@ def run(model_name, cuda_num, dropout_rate, lr, momentum=0):
 
     criterion = nn.CrossEntropyLoss().to(device)
     
-    # TODO for part 1: try lr = 1e-2 and 1e-1
-    optimizer = optim.SGD(model.parameters(), lr=lr)
+    """
+    Part 1
+    DROPOUT:
+        Try with SGD optimizer, Dropout rates of 0.2, 0.3, 0.4, 0.5 and constant LR of 0.001
     
-    # TODO for part 2
-    # lr_decay = lr/num_epochs
-    # optimizer = optim.Adagrad(model.parameters(), lr=lr, lr_decay=lr_decay) 
-    # optimizer = optim.Adam(params, lr=lr, betas=(0.9, 0.999), eps=1e-08) # try diff betas maybe (0.97, 0.98)
-    # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) # try momentums from 0.5-0.8 in .1 steps
+    Learning Rate/Weight Decay:
+        Try with Adagrad optimizer, Dropout 0, LR of 0.1, 0.01, 0.001 and Weight decay of 0.0001, 0.0005
 
+    """
+    optimizer = optim.SGD(model.parameters(), lr=lr)
+    # lr_decay = lr/num_epochs
+    # optimizer = optim.Adagrad(model.parameters(), lr=lr, lr_decay=lr_decay, weight_decay=weight_decay) 
+
+    """
+    Part 2
+    See which LR worked the best, and keep that constant
+    1. Introduce learning rate decay, lr_decay = lr/num_epochs
+    2. Try using Adam optimizer (have suggested different beta values)
+    3. Combine best dropout with Adagrad or Adam
+    4. SGD with dropout + introduce momentum
+    """
+    # TODO for part 2
+    # optimizer = optim.Adam(params, lr=lr, betas=(0.9, 0.999), eps=1e-08) # try diff betas maybe (0.97, 0.98)
+    # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) try momentums from 0.5-0.8 in .1 steps
     epoch = 1
 
     # save errors from each epoch
@@ -146,7 +161,7 @@ def run(model_name, cuda_num, dropout_rate, lr, momentum=0):
         val_top5_err = 1 - fiveclass_correct/val_total
 
         # write to file
-        f.write("\n\tValidation classification error %0.3f\n\tValidation top5 error %0.3f" % (epoch, val_class_err, val_top5_err))
+        f.write("\n\tValidation classification error %0.3f\n\tValidation top5 error %0.3f" % (val_class_err, val_top5_err))
 
         val_class_errors.append(val_class_err)
         val_top5_errors.append(val_top5_err)
@@ -169,12 +184,14 @@ def run(model_name, cuda_num, dropout_rate, lr, momentum=0):
 
 if __name__=='__main__':
     if len(sys.argv) < 5:
-        print("Expected: train.py <model_name> <cuda_num> <dropout_rate> <learning_rate>, momentum is optional")
+        print("Expected: train.py <model_name> <cuda_num> <dropout_rate> <learning_rate>, weight_decay and momentum are optional")
         sys.exit(2)
 
     print('Starting training')
-    if len(sys.argv) == 5: # no momentum
+    if len(sys.argv) == 5: # no weight decay or momentum
         run(sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]))
-    else:
+    elif len(sys.argv) == 6: # momentum
         run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]))
+    else: # has weight decay + momentum
+        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]))
     print('Training terminated')
