@@ -191,7 +191,7 @@ if __name__=='__main__':
     if len(sys.argv) == 5: # no weight decay or momentum
         run(sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]))
     elif len(sys.argv) == 6: # weight decay
-        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]))
+        run(sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]))
     else: # has weight decay + momentum
-        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]))
+        run(sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]))
     print('Training terminated')
