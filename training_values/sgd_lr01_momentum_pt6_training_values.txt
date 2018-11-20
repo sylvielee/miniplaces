@@ -1,0 +1,51 @@
+
+Epoch 1
+	Training classification error 0.858
+	Training top5 error 0.624
+	Validation classification error 0.858
+	Validation top5 error 0.618
+Epoch 2
+	Training classification error 0.797
+	Training top5 error 0.520
+	Validation classification error 0.799
+	Validation top5 error 0.520
+Epoch 3
+	Training classification error 0.749
+	Training top5 error 0.449
+	Validation classification error 0.756
+	Validation top5 error 0.454
+Epoch 4
+	Training classification error 0.713
+	Training top5 error 0.405
+	Validation classification error 0.729
+	Validation top5 error 0.420
+Epoch 5
+	Training classification error 0.674
+	Training top5 error 0.363
+	Validation classification error 0.697
+	Validation top5 error 0.389
+Epoch 6
+	Training classification error 0.644
+	Training top5 error 0.330
+	Validation classification error 0.670
+	Validation top5 error 0.367
+Epoch 7
+	Training classification error 0.620
+	Training top5 error 0.303
+	Validation classification error 0.658
+	Validation top5 error 0.355
+Epoch 8
+	Training classification error 0.592
+	Training top5 error 0.275
+	Validation classification error 0.649
+	Validation top5 error 0.339
+Epoch 9
+	Training classification error 0.556
+	Training top5 error 0.240
+	Validation classification error 0.634
+	Validation top5 error 0.320
+Epoch 10
+	Training classification error 0.540
+	Training top5 error 0.229
+	Validation classification error 0.630
+	Validation top5 error 0.324
