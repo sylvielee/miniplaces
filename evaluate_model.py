@@ -2,6 +2,7 @@
 
 import torch
 import sys, getopt
+import os
 import dataset
 
 from models.ResNet import *
@@ -9,42 +10,47 @@ from models.ResNet import *
 def evaluate_model(filepath):
     # load desired model
     print("Loading model at %s" % filepath)
-    model = resnet_18()
-    model.load_state_dict(torch.load(filepath))
+    model = resnet_18(0)
+    model.load_state_dict(torch.load(filepath, map_location=lambda storage, loc: storage))
     model.eval()
+
+    # get output file dir
+    output_dir = os.path.dirname(filepath)
 
     # get test data
     batch_size = 100
     _, test_loader = dataset.get_val_test_loaders(batch_size)
 
     # get test predictions
-    outname = 'output.txt'
+    outname = output_dir + '/output.txt'
     f = open(outname, 'w')
     print("Writing output to %s" % outname)
 
     image_index = 1
     image_len = 8
     base_image_name = "00000000"
+    print("Processing %d batches" % len(test_loader))
     for data in test_loader:
         images, _ = data
         prediction = model(images)
         _, best_five = torch.topk(prediction, 5)
-
-        # create image filename
-        imname = base_image_name + str(image_index)
-        if len(imname) > image_len:
-            imname = imname[len(imname)-image_len:]
-        imname += ".jpg"
-        imname = "test/" + imname
-        image_index += 1
         
         # format predictions into filename 1 2 3 4 5 output file
         for i in range(len(prediction)):
+            # create image filename
+            imname = base_image_name + str(image_index)
+            if len(imname) > image_len:
+                imname = imname[len(imname)-image_len:]
+            imname += ".jpg"
+            imname = "test/" + imname
+            image_index += 1
+
             line = imname + " "
             for j in range(len(prediction[i])):
                 line += str(prediction[i][j]) + " "
             f.write(line)
-        f.close()
+        print("Up to image %d" % image_index)
+    f.close()
 
 if __name__=='__main__':
     print ('Number of arguments:', len(sys.argv), 'arguments.')
