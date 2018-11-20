@@ -84,11 +84,11 @@ class ResNet(nn.Module):
     """
 
 
-    def __init__(self, block, layers, num_classes=100):
+    def __init__(self, block, layers, perc=0, num_classes=100):
         super(ResNet, self).__init__()
 
         self.in_planes = 64
-        self.perc = 0
+        self.perc = perc
 
         self.Conv1 = nn.Conv2d(3, self.in_planes, kernel_size=7, stride=2, padding=3, bias=False)
         self.BN1 = nn.BatchNorm2d(self.in_planes)
@@ -164,8 +164,8 @@ class ResNet(nn.Module):
         self.drop4.p = p_val
 
 
-def resnet_18():
-    model = ResNet(BasicBlock, [2, 2, 2, 2])
+def resnet_18(perc):
+    model = ResNet(BasicBlock, [2, 2, 2, 2], perc)
     return model
 
 

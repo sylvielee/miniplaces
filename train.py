@@ -1,4 +1,5 @@
 import gc
+import os
 import sys
 from torch.autograd import Variable
 import torch
@@ -12,17 +13,16 @@ import dataset
 from models.AlexNet import *
 from models.ResNet import *
 
-perc = 0
-def run(model_name):
+def run(model_name, cuda_num):
     # Parameters
     num_epochs = 10
     output_period = 10
     batch_size = 100
 
     # setup the device for running
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    model = resnet_18()
-    model.change_p(perc)
+    device = torch.device("cuda:%s" % cuda_num if torch.cuda.is_available() else "cpu")
+    dropout_rate = 0.2 # CHANGE FOR DROPOUT RATE
+    model = resnet_18(dropout_rate)
     model = model.to(device)
 
     train_loader, val_loader = dataset.get_data_loaders(batch_size)
@@ -31,6 +31,7 @@ def run(model_name):
     criterion = nn.CrossEntropyLoss().to(device)
     # TODO: optimizer is currently unoptimized
     # there's a lot of room for improvement/different optimizers
+    # try lr = 1e-2 and 1e-1
     optimizer = optim.SGD(model.parameters(), lr=1e-3)
     epoch = 1
 
@@ -71,8 +72,13 @@ def run(model_name):
                 gc.collect()
 
         gc.collect()
+        
         # save after every epoch
-        torch.save(model.state_dict(), "models/%s_model.%d" % (model_name, epoch))
+        try:
+            os.stat("models/" + model_name)
+        except:
+            os.mkdir("models/" + model_name)       
+        torch.save(model.state_dict(), "models/%s/model.%d" % (model_name, epoch))
 
         # TODO: Calculate classification error and Top-5 Error
         # on training and validation datasets here
@@ -104,16 +110,15 @@ def run(model_name):
         tn_top5_err = 1- fiveclass_correct/tn_total
 
         # write to file
-        f.write("\nEpoch %d training classification error %0.3f\n\ntraining top5 error %0.3f" % (epoch, tn_class_err, tn_top5_err))
+        f.write("\nEpoch %d\n\tTraining classification error %0.3f\n\tTraining top5 error %0.3f" % (epoch, tn_class_err, tn_top5_err))
 
         train_class_errors.append(tn_class_err)
         train_top5_errors.append(tn_top5_err)
 
         print("Training Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
 
-        model.change_p(0)
-        model.eval()
         # validation dataset classification error
+        model.eval()
         class_correct, fiveclass_correct = 0, 0
         for data in val_loader:
             images, labels = data
@@ -136,13 +141,12 @@ def run(model_name):
         val_top5_err = 1 - fiveclass_correct/val_total
 
         # write to file
-        f.write("Epoch %d validation classification error %0.3f\n\validation top5 error %0.3f" % (epoch, val_class_err, val_top5_err))
+        f.write("\n\tValidation classification error %0.3f\n\tValidation top5 error %0.3f" % (epoch, val_class_err, val_top5_err))
 
         val_class_errors.append(val_class_err)
         val_top5_errors.append(val_top5_err)
 
         print("Validation Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (val_total, val_class_err, val_top5_err))
-        model.change_p(perc)
         gc.collect()
         epoch += 1
 
@@ -159,10 +163,10 @@ def run(model_name):
     plt.savefig(image_folder + model_name + '_top5_comparison.png')
 
 if __name__=='__main__':
-    if len(sys.argv) < 2:
-        print("Expected: train.py <model_name>")
+    if len(sys.argv) < 3:
+        print("Expected: train.py <model_name> <cuda_num>")
         sys.exit(2)
 
     print('Starting training')
-    run(sys.argv[1])
+    run(sys.argv[1], sys.argv[2])
     print('Training terminated')
