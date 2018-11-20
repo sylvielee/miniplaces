@@ -4,7 +4,7 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 
-perc = .2
+perc = 0
 
 class BasicBlock(nn.Module):
 
