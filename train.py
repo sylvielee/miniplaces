@@ -111,6 +111,7 @@ def run():
         print("Training Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
 
         # model.change_p(0)
+        model.eval()
         # validation dataset classification error
         class_correct, fiveclass_correct = 0, 0
         for data in val_loader:
