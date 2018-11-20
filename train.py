@@ -16,7 +16,7 @@ from models.ResNet import *
 def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
     # Parameters
     num_epochs = 10
-    output_period = 10
+    output_period = 100
     batch_size = 100
 
     # setup the device for running
@@ -38,7 +38,7 @@ def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
         Try with Adagrad optimizer, Dropout 0, LR of 0.1, 0.01, 0.001 and Weight decay of 0.0001, 0.0005
 
     """
-    optimizer = optim.SGD(model.parameters(), lr=lr)
+    # optimizer = optim.SGD(model.parameters(), lr=lr)
     # lr_decay = lr/num_epochs
     # optimizer = optim.Adagrad(model.parameters(), lr=lr, lr_decay=lr_decay, weight_decay=weight_decay) 
 
@@ -52,7 +52,7 @@ def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
     """
     # TODO for part 2
     # optimizer = optim.Adam(params, lr=lr, betas=(0.9, 0.999), eps=1e-08) # try diff betas maybe (0.97, 0.98)
-    # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) try momentums from 0.5-0.8 in .1 steps
+    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) # try momentums from 0.5-0.8 in .1 steps
     epoch = 1
 
     # save errors from each epoch
@@ -190,8 +190,8 @@ if __name__=='__main__':
     print('Starting training')
     if len(sys.argv) == 5: # no weight decay or momentum
         run(sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]))
-    elif len(sys.argv) == 6: # momentum
-        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]))
+    elif len(sys.argv) == 6: # weight decay
+        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]))
     else: # has weight decay + momentum
-        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]))
+        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[4]), float(sys.argv[5]), float(sys.argv[6]))
     print('Training terminated')
