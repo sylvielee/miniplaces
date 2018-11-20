@@ -4,7 +4,6 @@ import math
 import torch.nn as nn
 import torch.nn.functional as F
 
-perc = 0
 
 class BasicBlock(nn.Module):
 
@@ -84,22 +83,24 @@ class ResNet(nn.Module):
     pre activated version of resnet
     """
 
+
     def __init__(self, block, layers, num_classes=100):
         super(ResNet, self).__init__()
 
         self.in_planes = 64
+        self.perc = 0
 
         self.Conv1 = nn.Conv2d(3, self.in_planes, kernel_size=7, stride=2, padding=3, bias=False)
         self.BN1 = nn.BatchNorm2d(self.in_planes)
-        
+
         self.layer1 = self._make_layer(block, 64, layers[0], stride=1)
-        self.drop1 = nn.Dropout(p=perc)
+        self.drop1 = nn.Dropout(p=self.perc)
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
-        self.drop2 = nn.Dropout(p=perc)
+        self.drop2 = nn.Dropout(p=self.perc)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
-        self.drop3 = nn.Dropout(p=perc)
+        self.drop3 = nn.Dropout(p=self.perc)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        self.drop4 = nn.Dropout(p=perc)
+        self.drop4 = nn.Dropout(p=self.perc)
 
         self.avgpool = nn.AvgPool2d(8)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
@@ -155,13 +156,15 @@ class ResNet(nn.Module):
 
         return output
 
+    def change_p(self,p_val):
+        self.perc = p_val
+
 
 def resnet_18():
     model = ResNet(BasicBlock, [2, 2, 2, 2])
     return model
 
-def change_p(self,p_val):
-    perc = p_val
+
 
 def resnet_34():
     model = ResNet(BasicBlock, [3, 4, 6, 3])

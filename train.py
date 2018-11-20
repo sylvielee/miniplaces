@@ -12,6 +12,7 @@ import dataset
 from models.AlexNet import *
 from models.ResNet import *
 
+perc = 0
 def run():
     # Parameters
     num_epochs = 10
@@ -21,7 +22,7 @@ def run():
     # setup the device for running
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = resnet_18()
-    change_p(.2)
+    model.change_p(perc)
     model = model.to(device)
 
     train_loader, val_loader = dataset.get_data_loaders(batch_size)
@@ -80,14 +81,16 @@ def run():
         # training dataset classification error
         for data in train_loader:
             images, labels = data
+            images = images.to(device)
+            labels = labels.to(device)
             prediction = model(images)
-            prediction = prediction.to('cpu')
+            # prediction = prediction.to('cpu')
 
             _, top_choices = torch.max(prediction, dim=1)
             _, top5_choices = torch.topk(prediction, 5)
 
             tn_total += labels.size(0)
-            
+
             class_correct += (top_choices == labels).sum().item()
             for i in range(labels.size(0)):
                 if labels[i] in top5_choices[i]:
@@ -99,21 +102,23 @@ def run():
         train_class_errors.append(tn_class_err)
         train_top5_errors.append(tn_top5_err)
 
-        print("Training Dataset of size %d \n\tClassification Error: %0.3f\n\tTop-5 Error: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
+        print("Training Dataset of size %d \n\tClassification Acc: %0.3f\n\tTop-5 Acc: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
 
-        change_p(0)
+        model.change_p(0)
         # validation dataset classification error
         class_correct, fiveclass_correct = 0, 0
         for data in val_loader:
             images, labels = data
+            images = images.to(device)
+            labels = labels.to(device)
             prediction = model(images)
-            prediction = prediction.to('cpu')
+            # prediction = prediction.to('cpu')
 
             _, top_choices = torch.max(prediction, dim=1)
             _, top5_choices = torch.topk(prediction, 5)
 
             val_total += labels.size(0)
-            
+
             class_correct += (top_choices == labels).sum().item()
             for i in range(labels.size(0)):
                 if labels[i] in top5_choices[i]:
@@ -125,8 +130,8 @@ def run():
         val_class_errors.append(val_class_err)
         val_top5_errors.append(val_top5_err)
 
-        print("Validation Dataset of size %d \n\tClassification Error: %0.3f\n\tTop-5 Error: %0.3f" % (val_total, val_class_err, val_top5_err))
-
+        print("Validation Dataset of size %d \n\tClassification Acc: %0.3f\n\tTop-5 Acc: %0.3f" % (val_total, val_class_err, val_top5_err))
+        model.change_p(perc)
         gc.collect()
         epoch += 1
 
