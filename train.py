@@ -13,7 +13,7 @@ import dataset
 from models.AlexNet import *
 from models.ResNet import *
 
-def run(model_name, cuda_num):
+def run(model_name, cuda_num, dropout_rate, lr, momentum=0):
     # Parameters
     num_epochs = 10
     output_period = 10
@@ -21,7 +21,6 @@ def run(model_name, cuda_num):
 
     # setup the device for running
     device = torch.device("cuda:%s" % cuda_num if torch.cuda.is_available() else "cpu")
-    dropout_rate = 0.2 # CHANGE FOR DROPOUT RATE
     model = resnet_18(dropout_rate)
     model = model.to(device)
 
@@ -29,10 +28,16 @@ def run(model_name, cuda_num):
     num_train_batches = len(train_loader)
 
     criterion = nn.CrossEntropyLoss().to(device)
-    # TODO: optimizer is currently unoptimized
-    # there's a lot of room for improvement/different optimizers
-    # try lr = 1e-2 and 1e-1
-    optimizer = optim.SGD(model.parameters(), lr=1e-3)
+    
+    # TODO for part 1: try lr = 1e-2 and 1e-1
+    optimizer = optim.SGD(model.parameters(), lr=lr)
+    
+    # TODO for part 2
+    # lr_decay = lr/num_epochs
+    # optimizer = optim.Adagrad(model.parameters(), lr=lr, lr_decay=lr_decay) 
+    # optimizer = optim.Adam(params, lr=lr, betas=(0.9, 0.999), eps=1e-08) # try diff betas maybe (0.97, 0.98)
+    # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) # try momentums from 0.5-0.8 in .1 steps
+
     epoch = 1
 
     # save errors from each epoch
@@ -72,7 +77,7 @@ def run(model_name, cuda_num):
                 gc.collect()
 
         gc.collect()
-        
+
         # save after every epoch
         try:
             os.stat("models/" + model_name)
@@ -163,10 +168,13 @@ def run(model_name, cuda_num):
     plt.savefig(image_folder + model_name + '_top5_comparison.png')
 
 if __name__=='__main__':
-    if len(sys.argv) < 3:
-        print("Expected: train.py <model_name> <cuda_num>")
+    if len(sys.argv) < 5:
+        print("Expected: train.py <model_name> <cuda_num> <dropout_rate> <learning_rate>, momentum is optional")
         sys.exit(2)
 
     print('Starting training')
-    run(sys.argv[1], sys.argv[2])
+    if len(sys.argv) == 5: # no momentum
+        run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    else:
+        run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     print('Training terminated')
