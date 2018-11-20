@@ -174,7 +174,7 @@ if __name__=='__main__':
 
     print('Starting training')
     if len(sys.argv) == 5: # no momentum
-        run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+        run(sys.argv[1], sys.argv[2], float(sys.argv[3]), float(sys.argv[4]))
     else:
-        run(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
+        run(sys.argv[1], sys.argv[2], sys.argv[3], float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]))
     print('Training terminated')
