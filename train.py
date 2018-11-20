@@ -156,7 +156,7 @@ def run(model_name):
     plt.clf()
 
     plt.plot(xaxis, train_top5_errors, xaxis, val_top5_errors)
-    plt.savefig(image_folder + model_name + './top5_comparison.png')
+    plt.savefig(image_folder + model_name + '_top5_comparison.png')
 
 if __name__=='__main__':
     if len(sys.argv) < 2:
