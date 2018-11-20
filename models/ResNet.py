@@ -156,8 +156,12 @@ class ResNet(nn.Module):
 
         return output
 
-    def change_p(self,p_val):
+    def change_p(self, p_val):
         self.perc = p_val
+        self.drop1.p = p_val
+        self.drop2.p = p_val
+        self.drop3.p = p_val
+        self.drop4.p = p_val
 
 
 def resnet_18():
