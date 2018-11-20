@@ -40,6 +40,9 @@ def run():
     val_class_errors = []
     val_top5_errors = []
 
+    # will save errors from each epoch
+    f = open('training_values.txt', 'w')
+
     while epoch <= num_epochs:
         running_loss = 0.0
         for param_group in optimizer.param_groups:
@@ -96,13 +99,16 @@ def run():
                 if labels[i] in top5_choices[i]:
                     fiveclass_correct += 1
 
-        tn_class_err = class_correct/tn_total
-        tn_top5_err = fiveclass_correct/tn_total
+        tn_class_err = 1- class_correct/tn_total
+        tn_top5_err = 1- fiveclass_correct/tn_total
+
+        # write to file
+        f.write("\nEpoch %d training classification error %0.3f\n\ntraining top5 error %0.3f" % (epoch, tn_class_err, tn_top5_err))
 
         train_class_errors.append(tn_class_err)
         train_top5_errors.append(tn_top5_err)
 
-        print("Training Dataset of size %d \n\tClassification Acc: %0.3f\n\tTop-5 Acc: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
+        print("Training Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
 
         model.change_p(0)
         # validation dataset classification error
@@ -124,16 +130,21 @@ def run():
                 if labels[i] in top5_choices[i]:
                     fiveclass_correct += 1
 
-        val_class_err = class_correct/val_total
-        val_top5_err = fiveclass_correct/val_total
+        val_class_err = 1 - class_correct/val_total
+        val_top5_err = 1 - fiveclass_correct/val_total
+
+        # write to file
+        f.write("Epoch %d validation classification error %0.3f\n\validation top5 error %0.3f" % (epoch, val_class_err, val_top5_err))
 
         val_class_errors.append(val_class_err)
         val_top5_errors.append(val_top5_err)
 
-        print("Validation Dataset of size %d \n\tClassification Acc: %0.3f\n\tTop-5 Acc: %0.3f" % (val_total, val_class_err, val_top5_err))
+        print("Validation Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (val_total, val_class_err, val_top5_err))
         model.change_p(perc)
         gc.collect()
         epoch += 1
+
+    f.close()
 
     # visualize errors
     xaxis = [i for i in range(num_epochs)]
