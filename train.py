@@ -13,7 +13,7 @@ from models.AlexNet import *
 from models.ResNet import *
 
 perc = 0
-def run():
+def run(model_name):
     # Parameters
     num_epochs = 10
     output_period = 10
@@ -22,7 +22,7 @@ def run():
     # setup the device for running
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = resnet_18()
-    # model.change_p(perc)
+    model.change_p(perc)
     model = model.to(device)
 
     train_loader, val_loader = dataset.get_data_loaders(batch_size)
@@ -41,7 +41,8 @@ def run():
     val_top5_errors = []
 
     # will save errors from each epoch
-    f = open('training_values.txt', 'w')
+    training_vals_folder = 'training_values/'
+    f = open(training_vals_folder + model_name + '_training_values.txt', 'w')
 
     while epoch <= num_epochs:
         running_loss = 0.0
@@ -71,7 +72,7 @@ def run():
 
         gc.collect()
         # save after every epoch
-        torch.save(model.state_dict(), "models/model.%d" % epoch)
+        torch.save(model.state_dict(), "models/%s_model.%d" % (model_name, epoch))
 
         # TODO: Calculate classification error and Top-5 Error
         # on training and validation datasets here
@@ -110,7 +111,7 @@ def run():
 
         print("Training Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (tn_total, tn_class_err, tn_top5_err))
 
-        # model.change_p(0)
+        model.change_p(0)
         model.eval()
         # validation dataset classification error
         class_correct, fiveclass_correct = 0, 0
@@ -141,21 +142,27 @@ def run():
         val_top5_errors.append(val_top5_err)
 
         print("Validation Dataset of size %d \n\tClassification Err: %0.3f\n\tTop-5 Err: %0.3f" % (val_total, val_class_err, val_top5_err))
-        # model.change_p(perc)
+        model.change_p(perc)
         gc.collect()
         epoch += 1
 
     f.close()
 
     # visualize errors
+    image_folder = 'imgs/'
     xaxis = [i for i in range(num_epochs)]
     plt.plot(xaxis, train_class_errors, xaxis, val_class_errors)
-    plt.savefig('./classification_comparison.png')
+    plt.savefig(image_folder + model_name + '_classification_comparison.png')
     plt.clf()
 
     plt.plot(xaxis, train_top5_errors, xaxis, val_top5_errors)
-    plt.savefig('./top5_comparison.png')
+    plt.savefig(image_folder + model_name + './top5_comparison.png')
 
-print('Starting training')
-run()
-print('Training terminated')
+if __name__=='__main__':
+    if len(sys.argv) < 2:
+        print("Expected: train.py <model_name>")
+        sys.exit(2)
+
+    print('Starting training')
+    run(sys.argv[1])
+    print('Training terminated')
