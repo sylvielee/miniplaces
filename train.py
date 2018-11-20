@@ -20,7 +20,8 @@ def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
     batch_size = 100
 
     # setup the device for running
-    device = torch.device("cuda:%s" % cuda_num if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     model = resnet_18(dropout_rate)
     model = model.to(device)
 
