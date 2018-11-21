@@ -4,6 +4,7 @@ import torch
 import sys, getopt
 import os
 import dataset
+import matplotlib.pyplot as plt
 
 from models.ResNet import *
 
@@ -19,7 +20,8 @@ def evaluate_model(filepath):
 
     # get test data
     batch_size = 100
-    _, test_loader = dataset.get_val_test_loaders(batch_size)
+    vl, test_loader = dataset.get_val_test_loaders(batch_size)
+    classes = vl.dataset.classes
 
     # get test predictions
     outname = output_dir + '/output.txt'
@@ -30,11 +32,13 @@ def evaluate_model(filepath):
     image_len = 8
     base_image_name = "00000000"
     print("Processing %d batches" % len(test_loader))
+    print(test_loader.dataset.classes)
+
     for data in test_loader:
-        images, _ = data
+        images, _ = data[:10]
         prediction = model(images)
         _, best_five = torch.topk(prediction, 5)
-        
+
         # format predictions into filename 1 2 3 4 5 output file
         for i in range(len(prediction)):
             # create image filename
@@ -47,10 +51,12 @@ def evaluate_model(filepath):
 
             line = imname + " "
             for j in range(len(best_five[i])):
-                line += str(best_five[i][j].item()) + " "
+                actual_class = classes[best_five[i][j].item()]
+                line += str(actual_class) + " "
             line += "\n"
             f.write(line)
         print("Up to image %d" % image_index)
+
     f.close()
 
 if __name__=='__main__':
