@@ -1,0 +1,11 @@
+
+Epoch 1
+	Training classification error 0.826
+	Training top5 error 0.566
+	Validation classification error 0.828
+	Validation top5 error 0.564
+Epoch 2
+	Training classification error 0.743
+	Training top5 error 0.442
+	Validation classification error 0.750
+	Validation top5 error 0.446
