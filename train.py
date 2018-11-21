@@ -15,7 +15,7 @@ from models.ResNet import *
 
 def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
     # Parameters
-    num_epochs = 10
+    num_epochs = 20
     output_period = 100
     batch_size = 100
 
