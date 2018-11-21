@@ -52,8 +52,8 @@ def run(model_name, cuda_num, dropout_rate, lr, weight_decay=0, momentum=0):
     4. SGD with dropout + introduce momentum
     """
     # TODO for part 2
-    # optimizer = optim.Adam(params, lr=lr, betas=(0.9, 0.999), eps=1e-08) # try diff betas maybe (0.97, 0.98)
-    optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) # try momentums from 0.5-0.8 in .1 steps
+    optimizer = optim.Adam(model.parameters(), lr=lr, betas=(0.9, 0.999), eps=1e-08) # try diff betas maybe (0.97, 0.98)
+    # optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum) # try momentums from 0.5-0.8 in .1 steps
     epoch = 1
 
     # save errors from each epoch
